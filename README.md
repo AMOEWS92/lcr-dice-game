@@ -1,70 +1,52 @@
-\# LCR Dice Game
-
-
+# LCR Dice Game
 
 A console-based implementation of the Left Center Right dice game built in C++.
 
-
-
 Players enter their names, take turns rolling dice, and pass chips left, right, or into the center pot based on each roll. The game continues until one player has all remaining chips.
 
+## Features
 
+- Supports three or more players
 
-\## Features
+- Collects player names at the start of the game
 
+- Simulates Left, Center, Right, and dot dice results
 
+- Tracks player chips and the center pot
 
-\- Supports three or more players
+- Validates player count input
 
-\- Collects player names at the start of the game
+- Displays game rules from a text file before play begins
 
-\- Simulates Left, Center, Right, and dot dice results
+## C++ Skills Demonstrated
 
-\- Tracks player chips and the center pot
+- Uses classes to organize game-related responsibilities, including players and dice behavior
 
-\- Validates player count input
+- Uses std::vector to store and manage a flexible list of players
 
-\- Displays game rules from a text file before play begins
+- Applies object-oriented programming through encapsulation and reusable game objects
 
+- Uses loops, conditionals, functions, and input validation to control game flow
 
+- Uses file input to load and display the game rules
 
-\## C++ Skills Demonstrated
+- Uses random number generation to simulate dice rolls
 
+## Built With
 
+- C++
 
-\- Uses classes to organize game-related responsibilities, including players and dice behavior
+- Visual Studio
 
-\- Uses `std::vector` to store and manage a flexible list of players
+## Running the Project
 
-\- Applies object-oriented programming through encapsulation and reusable game objects
+Open LCRFinalProject.sln in Visual Studio, then build and run the project.
 
-\- Uses loops, conditionals, functions, and input validation to control game flow
+## Project Files
 
-\- Uses file input to load and display the game rules
+- LCRFinalProject.cpp contains the game logic
 
-\- Uses random number generation to simulate dice rolls
-
-
-
-\## Built With
-
-
-
-\- C++
-
-\- Visual Studio
-
-
-
-\## Running the Project
-
-
-
-Open `LCRFinalProject.sln` in Visual Studio, then build and run the project.
-
-
-
-\## Project Files
+- LCRRules.txt contains the game rules shown to the player
 
 
 
