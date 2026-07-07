@@ -1,0 +1,23 @@
+Left Center Right is a multiplayer dice game for three or more players.
+The goal is to be the last player who still has chips.
+
+SETUP
+Each player starts with three chips.
+
+THE DICE
+Each turn uses up to three dice. Each die can show L, R, C, or a dot.
+
+L means pass one chip to the player on the left.
+R means pass one chip to the player on the right.
+C means place one chip in the center pot. Chips in the center are out of play.
+A dot means no action is taken.
+
+TAKING TURNS
+A player with three or more chips rolls three dice.
+A player with two chips rolls two dice.
+A player with one chip rolls one die.
+A player with zero chips does not roll, but remains in the game because another
+player may pass a chip to them.
+
+WINNING
+The winner is the last player who still has at least one chip.
