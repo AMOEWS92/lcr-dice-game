@@ -1,30 +1,32 @@
-/*
-	Name: August Moews
-	Course: IT 312
-	Date: June 20, 2026
-	Assignment: Final Project - Left Center Right Dice Game
-
-	Code Description:
-	This porgram creates a command-line version of the Left Center Right (LCR)
-	dice game. The program reads and displays the game rules from a text file, 
-	asks for the player names, gives each player three chips, and continues through
-	player turns until only one player has chips remaining.
-
-	Special Features:
-	This program uses a Player class to track each player's name and chips and
-	a Dice class to generate L, R, C, or neutral dice results. A vector stores
-	the players, and an array stores the results of each turn's dice rolls.
-*/
-
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <limits>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
+
+// Stores tournament statistics for one player.
+struct PlayerStats
+{
+	int gamesPlayed = 0;
+	int wins = 0;
+	int chipsWon = 0;
+};
+
+// Stores the result of one completed LCR game.
+struct GameResult
+{
+	string winnerName;
+	int winningChips = 0;
+	int centerPot = 0;
+};
 
 // Stores information for one LCR player.
 class Player
@@ -67,7 +69,7 @@ public:
 	}
 };
 
-// Generates one result from LCR die.
+// Generates one result from an LCR die.
 class Dice
 {
 public:
@@ -102,7 +104,10 @@ bool displayRules()
 
 	if (!rulesFile)
 	{
-		cout << "Unable to open the rules file: " << fileName << endl;
+		cout << "Unable to open the rules file: "
+			<< fileName
+			<< endl;
+
 		return false;
 	}
 
@@ -119,21 +124,26 @@ bool displayRules()
 	return true;
 }
 
-// Displays player's current number of chips.
+// Displays each player's current number of chips.
 void displayPlayerChips(const vector<Player>& players, int centerPot)
 {
-	cout << "\nCurrent Chips Counts\n";
-	cout << "------------------\n";
+	cout << "\nCurrent Chip Counts\n";
+	cout << "-------------------\n";
 
-	for (int playerIndex = 0; playerIndex < players.size(); playerIndex++)
+	for (int playerIndex = 0;
+		playerIndex < static_cast<int>(players.size());
+		playerIndex++)
 	{
 		cout << players[playerIndex].getName()
 			<< ": "
 			<< players[playerIndex].getChips()
-			<< " chips" << endl;
+			<< " chips"
+			<< endl;
 	}
 
-	cout << "Center pot: " << centerPot << " chips\n";
+	cout << "Center pot: "
+		<< centerPot
+		<< " chips\n";
 }
 
 // Counts how many players currently have at least one chip.
@@ -141,7 +151,9 @@ int countPlayersWithChips(const vector<Player>& players)
 {
 	int playersWithChips = 0;
 
-	for (int playerIndex = 0; playerIndex < players.size(); playerIndex++)
+	for (int playerIndex = 0;
+		playerIndex < static_cast<int>(players.size());
+		playerIndex++)
 	{
 		if (players[playerIndex].getChips() > 0)
 		{
@@ -155,7 +167,9 @@ int countPlayersWithChips(const vector<Player>& players)
 // Finds and returns the index of the player who still has chips.
 int findWinnerIndex(const vector<Player>& players)
 {
-	for (int playerIndex = 0; playerIndex < players.size(); playerIndex++)
+	for (int playerIndex = 0;
+		playerIndex < static_cast<int>(players.size());
+		playerIndex++)
 	{
 		if (players[playerIndex].getChips() > 0)
 		{
@@ -166,50 +180,25 @@ int findWinnerIndex(const vector<Player>& players)
 	return -1;
 }
 
-int main()
+// Plays one complete game of LCR and returns the game's result.
+GameResult playGame(const vector<string>& playerNames)
 {
-	srand(static_cast<unsigned int>(time(0)));
-
-	if (!displayRules())
-	{
-		return 1;
-	}
-
-	int numberOfPlayers;
-
-	cout << "\nEnter the number of players: ";
-	cin >> numberOfPlayers;
-
-	while (numberOfPlayers < 3)
-	{
-		cout << "LCR requires at least three players.\n";
-		cout << "Enter the number of players: ";
-		cin >> numberOfPlayers;
-	}
-
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
 	vector<Player> players;
 
-	// Collect player names and create a Player object for each participant.
-	for (int playerIndex = 0; playerIndex < numberOfPlayers; playerIndex++)
+	// Create a new Player object for each participant.
+	for (const string& playerName : playerNames)
 	{
-		string playerName;
-
-		cout << "Enter the name of player "
-			<< playerIndex + 1
-			<< ": ";
-
-		getline(cin, playerName);
-
 		players.push_back(Player(playerName));
 	}
 
 	Dice gameDice;
 	int centerPot = 0;
 	int currentPlayerIndex = 0;
+	int numberOfPlayers = static_cast<int>(players.size());
 
-	cout << "\nThe game is starting. Every player begins with three chips.\n";
+	cout << "\nThe game is starting. "
+		<< "Every player begins with three chips.\n";
+
 	displayPlayerChips(players, centerPot);
 
 	// Continue gameplay until only one player still has chips.
@@ -218,7 +207,8 @@ int main()
 		Player& currentPlayer = players[currentPlayerIndex];
 
 		cout << "\n----------------------------------------\n";
-		cout << currentPlayer.getName() << "'s turn\n";
+		cout << currentPlayer.getName()
+			<< "'s turn\n";
 
 		if (currentPlayer.getChips() == 0)
 		{
@@ -233,7 +223,6 @@ int main()
 			{
 				numberOfDice = 3;
 			}
-
 			else
 			{
 				numberOfDice = currentPlayer.getChips();
@@ -246,8 +235,10 @@ int main()
 				<< numberOfDice
 				<< " die/dice.\n";
 
-			// Roll and store each results in the dice array
-			for (int diceIndex = 0; diceIndex < numberOfDice; diceIndex++)
+			// Roll and store each result in the dice array.
+			for (int diceIndex = 0;
+				diceIndex < numberOfDice;
+				diceIndex++)
 			{
 				diceResults[diceIndex] = gameDice.rollDie();
 
@@ -259,14 +250,17 @@ int main()
 			}
 
 			// Apply chip movement for each die result.
-			for (int diceIndex = 0; diceIndex < numberOfDice; diceIndex++)
+			for (int diceIndex = 0;
+				diceIndex < numberOfDice;
+				diceIndex++)
 			{
 				char result = diceResults[diceIndex];
 
 				if (result == 'L' && currentPlayer.removeChip())
 				{
 					int leftPlayerIndex =
-						(currentPlayerIndex - 1 + numberOfPlayers) % numberOfPlayers;
+						(currentPlayerIndex - 1 + numberOfPlayers)
+						% numberOfPlayers;
 
 					players[leftPlayerIndex].addChip();
 
@@ -278,7 +272,8 @@ int main()
 				else if (result == 'R' && currentPlayer.removeChip())
 				{
 					int rightPlayerIndex =
-						(currentPlayerIndex + 1) % numberOfPlayers;
+						(currentPlayerIndex + 1)
+						% numberOfPlayers;
 
 					players[rightPlayerIndex].addChip();
 
@@ -304,21 +299,186 @@ int main()
 			displayPlayerChips(players, centerPot);
 		}
 
-		currentPlayerIndex = (currentPlayerIndex + 1) % numberOfPlayers;
+		currentPlayerIndex =
+			(currentPlayerIndex + 1) % numberOfPlayers;
 	}
 
 	int winnerIndex = findWinnerIndex(players);
 
+	GameResult result;
+	result.winnerName = players[winnerIndex].getName();
+	result.winningChips = players[winnerIndex].getChips();
+	result.centerPot = centerPot;
+
 	cout << "\n========================================\n";
 	cout << "Game Over!\n";
-	cout << players[winnerIndex].getName()
+
+	cout << result.winnerName
 		<< " wins LCR with "
-		<< players[winnerIndex].getChips()
+		<< result.winningChips
 		<< " chip(s) remaining.\n";
 
 	cout << "Chips in the center pot: "
-		<< centerPot
+		<< result.centerPot
 		<< endl;
+
+	return result;
+}
+
+// Updates tournament statistics after one completed game.
+void updateTournamentStats(
+	const vector<string>& playerNames,
+	const GameResult& gameResult,
+	unordered_map<string, PlayerStats>& tournamentStats)
+{
+	for (const string& playerName : playerNames)
+	{
+		tournamentStats[playerName].gamesPlayed++;
+	}
+
+	tournamentStats[gameResult.winnerName].wins++;
+	tournamentStats[gameResult.winnerName].chipsWon +=
+		gameResult.winningChips;
+}
+
+// Displays tournament standing sorted by wins and chips won.
+void displayLeaderboard(
+	const unordered_map<string, PlayerStats>& tournamentStats)
+{
+	vector<pair<string, PlayerStats>> leaderboard;
+
+	// Copy map entries into a vector so they can be sorted.
+	for (const auto& playerEntry : tournamentStats)
+	{
+		leaderboard.push_back(playerEntry);
+	}
+
+	// Sort wins first, then by chips won, then alphabetically.
+	sort(
+		leaderboard.begin(),
+		leaderboard.end(),
+		[](const pair<string, PlayerStats>& firstPlayer,
+			const pair<string, PlayerStats>& secondPlayer)
+		{
+			if (firstPlayer.second.wins != secondPlayer.second.wins)
+			{
+				return firstPlayer.second.wins >
+					secondPlayer.second.wins;
+			}
+
+			if (firstPlayer.second.chipsWon !=
+				secondPlayer.second.chipsWon)
+			{
+				return firstPlayer.second.chipsWon >
+					secondPlayer.second.chipsWon;
+			}
+
+			return firstPlayer.first < secondPlayer.first;
+		});
+
+	cout << "\nTournament Leaderboard\n";
+	cout << "======================\n";
+
+	for (int playerIndex = 0;
+		playerIndex < static_cast<int>(leaderboard.size());
+		playerIndex++)
+	{
+		const string& playerName =
+			leaderboard[playerIndex].first;
+
+		const PlayerStats& stats =
+			leaderboard[playerIndex].second;
+
+		cout << playerIndex + 1
+			<< ". "
+			<< playerName
+			<< endl;
+
+		cout << "  Games played: "
+			<< stats.gamesPlayed
+			<< endl;
+
+		cout << "  Wins: "
+			<< stats.wins
+			<< endl;
+
+		cout << "  Chips won: "
+			<< stats.chipsWon
+			<< endl
+			<< endl;
+	}
+}
+
+int main()
+{
+	srand(static_cast<unsigned int>(time(0)));
+
+	if (!displayRules())
+	{
+		return 1;
+	}
+
+	int numberOfPlayers;
+	string numberInput;
+	bool validNumber = false;
+
+	while (!validNumber)
+	{
+		cout << "\nEnter the number of players: ";
+		getline(cin, numberInput);
+
+		stringstream inputStream(numberInput);
+		char extraCharacter;
+
+		if (inputStream >> numberOfPlayers &&
+			numberOfPlayers >= 3 &&
+			!(inputStream >> extraCharacter))
+		{
+			validNumber = true;
+		}
+		else
+		{
+			cout << "Invalid input. Enter a whole number of at least 3.\n";
+		}
+	}
+
+	vector<string> playerNames;
+	unordered_map<string, PlayerStats> tournamentStats;
+
+	char playAgain = 'Y';
+
+	// Collect player names and initialize their statistics.
+	for (int playerIndex = 0;
+		playerIndex < numberOfPlayers;
+		playerIndex++)
+	{
+		string playerName;
+
+		cout << "Enter the name of player "
+			<< playerIndex + 1
+			<< ": ";
+
+		getline(cin, playerName);
+
+		playerNames.push_back(playerName);
+		tournamentStats[playerName] = PlayerStats();
+	}
+
+	while (toupper(playAgain) == 'Y')
+	{
+		GameResult gameResult = playGame(playerNames);
+
+		updateTournamentStats(
+			playerNames,
+			gameResult,
+			tournamentStats);
+
+		cout << "\nPlay another game? (Y/N): ";
+		cin >> playAgain;
+		cout << endl;
+	}
+
+	displayLeaderboard(tournamentStats);
 
 	return 0;
 }

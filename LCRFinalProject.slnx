@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="LCRFinalProject/LCRFinalProject.vcxproj" />
+  <Project Path="LCRFinalProject/LCRFinalProject.vcxproj" Id="5f81c861-a05f-4556-8dd2-b625c084572e" />
 </Solution>
